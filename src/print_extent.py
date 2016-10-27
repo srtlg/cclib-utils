@@ -1,6 +1,7 @@
 """
 Calculate the extent of the molecule for a proper volume
 """
+from __future__ import print_function
 import argparse
 
 import numpy as np
@@ -52,6 +53,7 @@ def _parse_args():
     p.add_argument('quantum_chemical_file')
     p.add_argument('-r', '--radius', type=float, default=1.5, help='radius in Angstrom')
     p.add_argument('-i', '--index', type=int, default=0, help='index of molecule')
+    p.add_argument('-o', '--output', help='write out bounding box out to file')
     return p.parse_args()
 
 
@@ -60,7 +62,9 @@ def main():
     log_file = ccopen(args.quantum_chemical_file)
     me = MolecularExtent(log_file.parse(), args.radius)
     me.calculate_extent(args.index)
-    me.as_jmol(args.index)
+    if args.output is not None:
+        me.as_jmol(args.index, output=args.output)
+    print('origin=', tuple(me.lower_limit), ', topcorner=', tuple(me.upper_limit), sep='')
 
 
 if __name__ == '__main__':
